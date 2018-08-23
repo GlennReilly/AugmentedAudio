@@ -2,20 +2,17 @@ package com.arqathon.glennreilly.augmentedaudio
 
 
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.AudioManager
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ListView
 import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager
+import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager.getCurrentVolume
 import com.arqathon.glennreilly.augmentedaudio.service.ActivityRecognitionService
 import com.google.android.gms.location.ActivityRecognitionClient
-import com.arqathon.glennreilly.augmentedaudio.data.ActivityNotificationEvent
-import com.arqathon.glennreilly.augmentedaudio.data.SoundSet
 
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -75,12 +72,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     .getString(MOST_PROBABLE_ACTIVITY, "")
             )
 
-        val volume = getCurrentVolume() //TODO need to factor in how our volume relates to system volume. Percentage?
+        val level = getCurrentVolume(this) //TODO need to factor in how our volume relates to system volume. Percentage?
 
         mostProbableActivity?.let {
-            val activityNotificationEvent = ActivityNotificationEvent(SoundSet(SoundManager.beepInAMajor, 3, volume, volume), it)
-            SoundManager.play(activityNotificationEvent)
-            //play(it)
+            SoundManager.playSoundFor(it, applicationContext)
         }
 
         val detectedActivities = ActivityRecognitionService.detectedActivitiesFromJson(
@@ -92,13 +87,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
 
-    fun getCurrentVolume(): Float {
-        val audioManager = this.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val actVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
-        val volume = actVolume / maxVolume //TODO need to factor in how our volume relates to system volume. Percentage?
-        return volume
-    }
+
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
         if (s == DETECTED_ACTIVITY) {
