@@ -10,7 +10,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.location.Location
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
@@ -24,7 +23,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import com.arqathon.glennreilly.augmentedaudio.R.drawable
 import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager
@@ -38,7 +36,6 @@ import com.arqathon.glennreilly.home.NextAdapter
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.ActivityRecognitionClient
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.next_activity.*
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -100,19 +97,21 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     val longitude = intent.getStringExtra(LocationMonitoringService.EXTRA_LONGITUDE)
 
                     if (latitude != null && longitude != null) {
-                        (mMsgView as TextView).text = getString(R.string.msg_location_service_started) + "\n Latitude : " + latitude + "\n Longitude: " + longitude
+//                        (mMsgView as TextView).text = getString(R.string.msg_location_service_started) + "\n Latitude : " + latitude + "\n Longitude: " + longitude
 
                         var results = arrayOf<Float>().toFloatArray()
-
+                        val distanceBetweens = mutableListOf<Float>()
                         PointsOfInterestProvider.pointsOfInterestCollection?.pointsOfInterestCollection?.forEach {
-                            Location.distanceBetween(
-                                latitude.toDouble(),
-                                longitude.toDouble(),
-                                it.lat.toDouble(),
-                                it.lon.toDouble(),
-                                results
-                            )
+                            distanceBetweens.add(
+                                distance(
+                                latitude.toFloat(),
+                                longitude.toFloat(),
+                                it.lat,
+                                it.lon
+                            ))
                         }
+
+                        SpeechManager.ConvertTextToSpeech("aaah I am talking!!!")
                     }
                 }
             }, IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST)
@@ -274,9 +273,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         //And it will be keep running until you close the entire application from task manager.
         //This method will executed only once.
 
-        if (!mAlreadyStartedService && mMsgView != null) {
+        if (!mAlreadyStartedService) {
 
-            (mMsgView as TextView).setText(R.string.msg_location_service_started)
+//            (mMsgView as TextView).setText(R.string.msg_location_service_started)
 
             //Start location sharing service to app server.........
             val intent = Intent(this, LocationMonitoringService::class.java)
@@ -427,5 +426,18 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         super.onDestroy()
     }
 
+    fun distance(lat_a: Float, lng_a: Float, lat_b: Float, lng_b: Float): Float {
+        val earthRadius = 3958.75
+        val latDiff = Math.toRadians((lat_b - lat_a).toDouble())
+        val lngDiff = Math.toRadians((lng_b - lng_a).toDouble())
+        val a = Math.sin(latDiff / 2) * Math.sin(latDiff / 2) + Math.cos(Math.toRadians(lat_a.toDouble())) * Math.cos(Math.toRadians(lat_b.toDouble())) *
+            Math.sin(lngDiff / 2) * Math.sin(lngDiff / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        val distance = earthRadius * c
+
+        val meterConversion = 1609
+
+        return (distance * meterConversion).toFloat()
+    }
 
 }
