@@ -13,4 +13,5 @@
     <dimen name="go_height">54dp</dimen>
     <dimen name="play_size">64dp</dimen>
     <dimen name="chbox_size">42dp</dimen>
+    <dimen name="place_height">64dp</dimen>
 </resources>

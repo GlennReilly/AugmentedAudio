@@ -16,6 +16,10 @@ data class NextViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     fun setPlace(name: String) {
         view.findViewById<TextView>(R.id.place_name).text = name
     }
+
+    fun setDistance(proximity: Int) {
+        view.findViewById<TextView>(R.id.place_distance).text = "$proximity m"
+    }
 }
 
 class NextAdapter(val activity: Activity) : Adapter<NextViewHolder>() {
@@ -37,6 +41,7 @@ class NextAdapter(val activity: Activity) : Adapter<NextViewHolder>() {
     override fun onBindViewHolder(holder: NextViewHolder, position: Int) {
         val item = places[position]
         holder.setPlace(item.name)
+        holder.setDistance(item.proximity)
     }
 
     override fun getItemCount(): Int {
