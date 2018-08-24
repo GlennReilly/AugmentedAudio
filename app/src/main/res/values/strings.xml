@@ -10,7 +10,7 @@
     <string name="unknown_activity">Unknown activity %s</string>
     <string name="vehicle">In a vehicle</string>
     <string name="walking">Walking</string>
-    <string name="home_activity_title">Augumented Audio</string>
+    <string name="home_activity_title">audigo</string>
     <string name="next_activity_title">Places of interest</string>
     <string name="interests_label">Interests</string>
         <string name="permission_rationale">Please grant location permission to start the service</string>

@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.arqathon.glennreilly.augmentedaudio.MainActivity
 import com.arqathon.glennreilly.augmentedaudio.R
-import com.arqathon.glennreilly.augmentedaudio.R.string
 import kotlinx.android.synthetic.main.home_activity.*
 
 class HomeActivity : AppCompatActivity() {
@@ -17,8 +16,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home_activity)
 
-        setupToolbar()
-
         categories_label.setText(getString(R.string.interests_label))
 
         next_button.setOnClickListener{
@@ -27,11 +24,6 @@ class HomeActivity : AppCompatActivity() {
 
         initialiseCategories()
 
-    }
-
-    private fun setupToolbar() {
-        toolbar.setTitle(string.home_activity_title)
-        this.setSupportActionBar(toolbar)
     }
 
     private fun openNextActivity() {

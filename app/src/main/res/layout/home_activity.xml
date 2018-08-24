@@ -2,28 +2,35 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <FrameLayout
+        android:id="@+id/fake_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        app:title="@string/home_activity_title"
         android:background="@color/colorPrimary"
-        app:titleTextColor="@color/white"
-        android:elevation="4dp"/>
+        android:layout_centerHorizontal="true"
+        android:padding="10dp">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/logo"
+            android:tint="@color/white"/>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/categories_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/fake_toolbar"
         android:layout_alignParentStart="true"
-        android:padding="@dimen/unit4"
+        android:layout_marginTop="@dimen/unit8"
+        android:layout_marginStart="@dimen/unit4"
         android:textSize="24sp"
         tools:text= "Interests:"/>
 
@@ -39,11 +46,11 @@
 
     <ImageView
         android:id="@+id/next_button"
-        android:layout_width="@dimen/play_size"
-        android:layout_height="@dimen/play_size"
+        android:layout_width="@dimen/go_width"
+        android:layout_height="@dimen/go_height"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_navigate_next_black_24dp"
-        android:layout_marginBottom="@dimen/unit6"
+        android:src="@drawable/go_button"
+        android:layout_marginBottom="@dimen/unit10"
         android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

@@ -23,7 +23,7 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:paddingTop="@dimen/unit2"
         android:layout_marginStart="@dimen/unit2"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/next_toolbar"
         android:layout_alignParentStart="true"/>
 
     <ImageView

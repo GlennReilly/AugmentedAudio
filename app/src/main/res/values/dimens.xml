@@ -6,7 +6,11 @@
     <dimen name="unit2">8dp</dimen>
     <dimen name="unit4">16dp</dimen>
     <dimen name="unit6">24dp</dimen>
+    <dimen name="unit8">32dp</dimen>
+    <dimen name="unit10">40dp</dimen>
     <dimen name="margin">12dp</dimen>
+    <dimen name="go_width">80dp</dimen>
+    <dimen name="go_height">54dp</dimen>
     <dimen name="play_size">64dp</dimen>
     <dimen name="chbox_size">42dp</dimen>
 </resources>
