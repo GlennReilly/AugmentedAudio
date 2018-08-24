@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
@@ -81,10 +82,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         setupToolbar()
 
-        initPalyButton(!buttonPlay)
+        initPlayButton(!buttonPlay)
 
         play_button.setOnClickListener{
-            initPalyButton(buttonPlay)
+            initPlayButton(buttonPlay)
         }
 
         places_list.adapter = adapter
@@ -100,13 +101,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
                     if (latitude != null && longitude != null) {
                         (mMsgView as TextView).text = getString(R.string.msg_location_service_started) + "\n Latitude : " + latitude + "\n Longitude: " + longitude
+
+                        var results = arrayOf<Float>().toFloatArray()
+
+                        PointsOfInterestProvider.pointsOfInterestCollection?.pointsOfInterestCollection?.forEach {
+                            Location.distanceBetween(
+                                latitude.toDouble(),
+                                longitude.toDouble(),
+                                it.lat.toDouble(),
+                                it.lon.toDouble(),
+                                results
+                            )
+                        }
                     }
                 }
             }, IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST)
         )
     }
 
-    private fun initPalyButton(play: Boolean) {
+    private fun initPlayButton(play: Boolean) {
         if (!play) {
             play_button.setImageResource(drawable.ic_pause_circle_outline_black_24dp)
             buttonPlay = true
@@ -159,19 +172,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         //task.addOnSuccessListener { updateDetectedActivitiesList() }
         SpeechManager.ConvertTextToSpeech("hello ")
     }
-
-//    private fun updateDetectedActivitiesList() {
-//
-//        val mostProbableActivity =
-//            ActivityRecognitionService.getMostProbableActivityFromJson(
-//                PreferenceManager.getDefaultSharedPreferences(this)
-//                    .getString(MOST_PROBABLE_ACTIVITY, "")
-//            )
-//
-//        mostProbableActivity?.let {
-//            //SoundManager.playSoundFor(it, applicationContext)
-//        }
-//    }
 
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
@@ -429,86 +429,3 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
 
 }
-
-//
-//class MainActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks,
-//        GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener {
-//
-//    var mTTS: TextToSpeech? = null
-//    private val ACT_CHECK_TTS_DATA = 1000
-//    private lateinit var activityRecognitionClient: ActivityRecognitionClient
-//    var mApiClient: GoogleApiClient? = null
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_main)
-//
-//        mApiClient = GoogleApiClient.Builder(this)
-//                .addApi(ActivityRecognition.API)
-//                .addConnectionCallbacks(this)
-//                .addOnConnectionFailedListener(this)
-//                .build()
-//
-//        (mApiClient as GoogleApiClient).connect()
-//        activityRecognitionClient = ActivityRecognitionClient(this)
-//    }
-//
-//    override fun onInit(status: Int) {
-//        if (status == TextToSpeech.SUCCESS) {
-//            if (mTTS != null) {
-//                val result = (mTTS as TextToSpeech).setLanguage(Locale.US)
-//                if (result == TextToSpeech.LANG_MISSING_DATA ||
-//                        result == TextToSpeech.LANG_NOT_SUPPORTED) {
-//                    Toast.makeText(this, "TTS language is not supported", Toast.LENGTH_LONG).show()
-//                } else {
-//                    saySomething("TTS is ready", 0)
-//                }
-//            }
-//        } else {
-//            Toast.makeText(this, "TTS initialization failed",
-//                    Toast.LENGTH_LONG).show()
-//        }
-//    }
-//
-//    private fun saySomething(text: String, qmode: Int) {
-//        if (qmode == 1)
-//            mTTS?.speak(text, TextToSpeech.QUEUE_ADD, null, null)
-//        else
-//            mTTS?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-//    }
-//
-//    override fun onConnected(bundle: Bundle?) {
-//        val intent = Intent(this, ActivityRecognizedService::class.java)
-//        val pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-//        val task = activityRecognitionClient.requestActivityUpdates(3000, pendingIntent)
-//        //task.addOnSuccessListener { }
-//    }
-//
-//    override fun onConnectionSuspended(i: Int) {
-//
-//    }
-//
-//    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-//
-//    }
-//
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        if (requestCode == SpeechManager.ACT_CHECK_TTS_DATA) {
-//            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-//                // Data exists, so we instantiate the TTS engine
-//                SpeechManager.tts = TextToSpeech(this, SpeechManager)
-//            } else {
-//                // Data is missing, so we start the TTS
-//                // installation process
-//                val installIntent = Intent()
-//                installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-//                startActivity(installIntent)
-//            }
-//        }
-//    }
-//
-//    override fun onDestroy() {
-//        SpeechManager.shutdown()
-//        super.onDestroy()
-//    }
-//}

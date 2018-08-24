@@ -33,6 +33,43 @@
             "categories": [
                 "history"
             ]
+        },
+        {
+            "lat": -33.859574,
+            "lon": 151.204576,
+            "proximity": 100,
+            "type": "poi",
+            "name": "Sydney Observatory",
+            "headline": "Sydney Observatory is located on a hill now known as Observatory Hill in the centre of Sydney. The site evolved from a fort built on 'Windmill Hill' in the early 19th century to an astronomical observatory during the nineteenth century. It is now a working museum where evening visitors can observe the stars and planets through a modern 40 cm Schmidt-Cassegrain telescope and a historic 29 cm refractor telescope built in 1874, the oldest telescope in Australia in regular use.",
+            "detail": "In 1797, early on during the European settlement of New South Wales, Australia, a windmill was built on the hill above the first settlement. Within ten years the windmill had deteriorated to the point of being useless; the canvas sails were stolen, a storm damaged the machinery, and already by 1800 the foundations were giving way. The name of Millers Point remembers this early land use.",
+            "categories": [
+                "history"
+            ]
+        },
+        {
+            "lat": -33.85844,
+            "lon": 151.205546,
+            "proximity": 100,
+            "type": "poi",
+            "name": "The Garrison Church",
+            "headline": "The Garrison Church, also known as Holy Trinity in Millers Point, Sydney was the first military church built in colonial Australia. It continues as an active Anglican church, now in a joint parish with St Philip's Church, part of the Diocese of Sydney.",
+            "detail": "The Garrison Church was planned at a meeting convened by Reverend William Cowper in December 1839 because the seating capacity at the nearby St Philip's Church had been outgrown by the congregation. Cowper made a significant contribution to funding the church, stipulating that it be named The Holy Trinity. The land was granted for the church and associated schoolhouse by George Gipps. The foundation stone was laid by Bishop William Broughton[6] on 23 June 1840.",
+            "categories": [
+                "history"
+            ]
+        },
+        {
+            "lat": -33.858512,
+            "lon": 151.208943,
+            "proximity": 100,
+            "type": "poi",
+            "name": "The Rocks Discovery Museum",
+            "headline": "The Rocks Discovery Museum is a free, family friendly museum which tells the story of The Rocks area of Sydney from pre-European days to the present.",
+            "detail": "Housed in a restored 1850s sandstone warehouse, the museum is home to a unique collection of images and archaeological artefacts found in The Rocks – some of which you can even hold. The exhibits are filled with interactive fun, using touch screens, audio and visual elements to bring the history of the area alive.",
+            "categories": [
+                "architecture",
+                "culture"
+            ]
         }
     ]
 }
