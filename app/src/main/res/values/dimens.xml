@@ -1,4 +1,12 @@
 <resources>
     <dimen name="layout_padding">20dp</dimen>
     <dimen name="textview_margin">10dp</dimen>
+    <dimen name="category_height">42dp</dimen>
+    <dimen name="unit">4dp</dimen>
+    <dimen name="unit2">8dp</dimen>
+    <dimen name="unit4">16dp</dimen>
+    <dimen name="unit6">24dp</dimen>
+    <dimen name="margin">12dp</dimen>
+    <dimen name="play_size">64dp</dimen>
+    <dimen name="chbox_size">42dp</dimen>
 </resources>
