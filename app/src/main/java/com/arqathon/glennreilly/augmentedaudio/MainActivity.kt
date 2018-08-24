@@ -19,6 +19,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
+import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -26,6 +27,7 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager
+import com.arqathon.glennreilly.augmentedaudio.audio.SpeechManager
 import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager.getCurrentVolume
 import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity
 import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity.Companion
@@ -99,10 +101,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     override fun onResume() {
         super.onResume()
-        SoundManager.configureSound(this)
+        SoundManager.init(this)
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)
         updateDetectedActivitiesList()
+
+        SpeechManager.init(this)
 
         startStep1()
     }
@@ -128,10 +132,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     .getString(MOST_PROBABLE_ACTIVITY, "")
             )
 
-        val level = getCurrentVolume(this) //TODO need to factor in how our volume relates to system volume. Percentage?
-
         mostProbableActivity?.let {
-            SoundManager.playSoundFor(it, applicationContext)
+            //SoundManager.playSoundFor(it, applicationContext)
         }
 
         val detectedActivities = ActivityRecognitionService.detectedActivitiesFromJson(
@@ -462,28 +464,22 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks,
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == ACT_CHECK_TTS_DATA) {
+        if (requestCode == SpeechManager.ACT_CHECK_TTS_DATA) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 // Data exists, so we instantiate the TTS engine
-                mTTS = TextToSpeech(this, this)
+                SpeechManager.tts = TextToSpeech(this, SpeechManager)
             } else {
                 // Data is missing, so we start the TTS
                 // installation process
                 val installIntent = Intent()
-                installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+                installIntent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
                 startActivity(installIntent)
             }
         }
     }
 
     override fun onDestroy() {
-        if (mTTS != null) {
-            (mTTS as TextToSpeech).apply {
-                stop()
-                shutdown()
-            }
-        }
+        SpeechManager.shutdown()
         super.onDestroy()
     }
 }
-*/
