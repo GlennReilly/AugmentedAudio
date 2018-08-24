@@ -1,0 +1,38 @@
+{
+    "pointsOfInterestCollection": [
+        {
+            "lat": -33.85985,
+            "lon": 151.20901,
+            "proximity": 500,
+            "type": "region",
+            "name": "The Rocks",
+            "headline": "The Rocks is an urban locality, tourist precinct and historic area of Sydney's city centre. It is located on the southern shore of Sydney Harbour, immediately north-west of the Sydney central business district.",
+            "detail": "The Rocks became established shortly after the colony's formation in 1788. It was known as Tallawoladah by the Cadigal people. The original buildings were first traditional vernacular houses, of wattle and daub, with thatched roofs, and later of local sandstone, from which the area derives its name.",
+            "categories": []
+        },
+        {
+            "lat": -33.860019,
+            "lon": 151.208999,
+            "proximity": 100,
+            "type": "poi",
+            "name": "Museum of Contemporary Art",
+            "headline": "The Museum of Contemporary Art is an Australian museum solely dedicated to exhibiting, interpreting and collecting contemporary art, both from across Australia and around the world. It is housed in the art deco-style former Maritime Services Board Building on the western edge of Circular Quay.",
+            "detail": "The museum was opened in 1991 as the Museum of Contemporary Art, Sydney, and from 2010 underwent an A$58 million expansion and re-development, reopening on 29 March 2012 under its current name as the Museum of Contemporary Art Australia. The collection contains over 4 thousand works by Australian artists that have been acquired since 1989. The collection spans all art forms with strong holdings in painting, photography, sculpture, works on paper and moving image, as well as significant representation of works by Aboriginal and Torres Strait Islander artists.",
+            "categories": [
+                "architecture"
+            ]
+        },
+        {
+            "lat": -33.858905555556,
+            "lon": 151.20918888889,
+            "proximity": 100,
+            "type": "poi",
+            "name": "Cadmans Cottage",
+            "headline": "Cadmans Cottage is the second oldest surviving residential building in Sydney, Australia, having been built in 1816 for the use of the governmental coxswains and their crews. The building is heavily steeped in the history of Sydney, also claiming the title as the first building to have been built on the shoreline of The Rocks area. It is claimed that during high tide, the water would come within 8 feet (2.4 m) of Cadmans Cottage; however, due to the reclamation of land during the building of Circular Quay, the waterline has moved about 100 metres away since 1816.",
+            "detail": "The building has had several different uses in its lifetime—first and foremost as the abode of the four governmental coxswains (from 1816 until 1845), the headquarters of the Sydney Water Police (from 1845 to 1864) and as the Sailor's Home (from 1865 to 1970). Restoration of Cadmans Cottage began in 1972 after it was proclaimed a Heritage site under the National Parks and Wildlife Act and control of the site was handed over to the Sydney Cove Redevelopment Authority.",
+            "categories": [
+                "history"
+            ]
+        }
+    ]
+}
