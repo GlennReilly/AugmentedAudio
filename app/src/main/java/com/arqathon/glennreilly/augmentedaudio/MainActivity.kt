@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.ListView
 import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager
 import com.arqathon.glennreilly.augmentedaudio.audio.SpeechManager
+import com.arqathon.glennreilly.augmentedaudio.data.PointsOfInterestProvider
 import com.arqathon.glennreilly.augmentedaudio.service.ActivityRecognitionService
 import com.google.android.gms.location.ActivityRecognitionClient
 
@@ -46,12 +47,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     override fun onResume() {
         super.onResume()
-        SoundManager.init(this)
+        PointsOfInterestProvider.initialise(this)
+        SoundManager.initialise(this)
+        SpeechManager.initialise(this)
+
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)
         updateDetectedActivitiesList()
 
-        SpeechManager.init(this)
     }
 
     override fun onPause() {
@@ -65,6 +68,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             3000, activityDetectionPendingIntent
         )
         task.addOnSuccessListener { updateDetectedActivitiesList() }
+        SpeechManager.ConvertTextToSpeech("hello ")
     }
 
     private fun updateDetectedActivitiesList() {

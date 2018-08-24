@@ -16,7 +16,11 @@ GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener {
     val ACT_CHECK_TTS_DATA = 1000
     var mApiClient: GoogleApiClient? = null
 
-    fun init(ctx: Context){
+    fun initialise(ctx: Context){
+        tts = TextToSpeech(ctx, SpeechManager).apply {
+
+        }
+
         mApiClient = GoogleApiClient.Builder(ctx)
             .addApi(ActivityRecognition.API)
             .addConnectionCallbacks(this)
@@ -31,17 +35,17 @@ GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener {
             val result=tts?.setLanguage(Locale.US)
             if(result==TextToSpeech.LANG_MISSING_DATA ||
                 result==TextToSpeech.LANG_NOT_SUPPORTED){
-                Log.e("error", "This Language is not supported")
+                Log.e("error", "TTS: This Language is not supported")
             }
-            else{
-                ConvertTextToSpeech("Wow, this actually works!")
-            }
+/*            else{
+                ConvertTextToSpeech("Wow, this actually works too!")
+            }*/
         }
         else
-            Log.e("error", "Initilization Failed!")
+            Log.e("error", "TTS: Initilization Failed!")
     }
 
-    private fun ConvertTextToSpeech(text: String, qmode: Int = 1) {
+    public fun ConvertTextToSpeech(text: String, qmode: Int = 1) {
         if (qmode == 1)
             tts?.speak(text, TextToSpeech.QUEUE_ADD, null, null)
         else

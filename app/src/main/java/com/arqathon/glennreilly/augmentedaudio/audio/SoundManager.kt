@@ -26,7 +26,7 @@ object SoundManager {
 
     var beepInAMajor: Int = 0
 
-    fun init(context: Context) {
+    fun initialise(context: Context) {
         val attributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_MEDIA)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
