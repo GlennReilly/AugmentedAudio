@@ -19,26 +19,26 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
-import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
-import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import com.arqathon.glennreilly.augmentedaudio.R.drawable
 import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager
 import com.arqathon.glennreilly.augmentedaudio.audio.SpeechManager
-import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager.getCurrentVolume
-import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity
-import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity.Companion
-import com.arqathon.glennreilly.augmentedaudio.gps.services.LocationMonitoringService
 import com.arqathon.glennreilly.augmentedaudio.data.PointsOfInterestProvider
+import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity
+import com.arqathon.glennreilly.augmentedaudio.gps.services.LocationMonitoringService
+import com.arqathon.glennreilly.augmentedaudio.model.PointOfInterest
 import com.arqathon.glennreilly.augmentedaudio.service.ActivityRecognitionService
+import com.arqathon.glennreilly.home.NextAdapter
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.ActivityRecognitionClient
-
-import kotlinx.android.synthetic.main.activity_main.mMsgView
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.next_activity.*
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     private var mActivityRecognitionClient: ActivityRecognitionClient? = null
@@ -70,20 +70,26 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             return true
         }
 
+    private val adapter = NextAdapter(this)
+
+    private var buttonPlay = true
+
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.next_activity)
 
-        val detectedActivitiesListView = findViewById<View>(R.id.activities_listview) as ListView
+        setupToolbar()
 
-        val detectedActivities = ActivityRecognitionService.detectedActivitiesFromJson(
-            PreferenceManager.getDefaultSharedPreferences(this).getString(
-                DETECTED_ACTIVITY, ""
-            )
-        )
-        mAdapter = ActivitiesAdapter(this, detectedActivities)
-        detectedActivitiesListView.adapter = mAdapter
+        initPalyButton(!buttonPlay)
+
+        play_button.setOnClickListener{
+            initPalyButton(buttonPlay)
+        }
+
+        places_list.adapter = adapter
+        places_list.layoutManager = LinearLayoutManager(this)
+
         mActivityRecognitionClient = ActivityRecognitionClient(this)
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -100,6 +106,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         )
     }
 
+    private fun initPalyButton(play: Boolean) {
+        if (!play) {
+            play_button.setImageResource(drawable.ic_pause_circle_outline_black_24dp)
+            buttonPlay = true
+        } else {
+            play_button.setImageResource(drawable.ic_play_circle_outline_black_24dp)
+            buttonPlay = false
+        }
+    }
+
+    private fun setupToolbar() {
+        next_toolbar.setTitle(R.string.next_activity_title)
+        this.setSupportActionBar(next_toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         PointsOfInterestProvider.initialise(this)
@@ -108,7 +133,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)
-        updateDetectedActivitiesList()
+
+        val pointsOfInterestCollection: List<PointOfInterest>?
+            = PointsOfInterestProvider.pointsOfInterestCollection?.pointsOfInterestCollection
+
+        pointsOfInterestCollection?.let {
+            adapter.addAll(it)
+        }
 
         SpeechManager.initialise(this)
 
@@ -125,34 +156,27 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val task = mActivityRecognitionClient!!.requestActivityUpdates(
             3000, activityDetectionPendingIntent
         )
-        task.addOnSuccessListener { updateDetectedActivitiesList() }
+        //task.addOnSuccessListener { updateDetectedActivitiesList() }
         SpeechManager.ConvertTextToSpeech("hello ")
     }
 
-    private fun updateDetectedActivitiesList() {
-
-        val mostProbableActivity =
-            ActivityRecognitionService.getMostProbableActivityFromJson(
-                PreferenceManager.getDefaultSharedPreferences(this)
-                    .getString(MOST_PROBABLE_ACTIVITY, "")
-            )
-
-        mostProbableActivity?.let {
-            //SoundManager.playSoundFor(it, applicationContext)
-        }
-
-        val detectedActivities = ActivityRecognitionService.detectedActivitiesFromJson(
-            PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(DETECTED_ACTIVITY, "")
-        )
-
-        mAdapter!!.updateActivities(detectedActivities)
-    }
+//    private fun updateDetectedActivitiesList() {
+//
+//        val mostProbableActivity =
+//            ActivityRecognitionService.getMostProbableActivityFromJson(
+//                PreferenceManager.getDefaultSharedPreferences(this)
+//                    .getString(MOST_PROBABLE_ACTIVITY, "")
+//            )
+//
+//        mostProbableActivity?.let {
+//            //SoundManager.playSoundFor(it, applicationContext)
+//        }
+//    }
 
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
         if (s == DETECTED_ACTIVITY) {
-            updateDetectedActivitiesList()
+            //updateDetectedActivitiesList()
         }
     }
 

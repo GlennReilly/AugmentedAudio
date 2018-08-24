@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import com.arqathon.glennreilly.augmentedaudio.MainActivity
 import com.arqathon.glennreilly.augmentedaudio.R
 import com.arqathon.glennreilly.augmentedaudio.R.string
 import kotlinx.android.synthetic.main.home_activity.*
@@ -31,13 +32,10 @@ class HomeActivity : AppCompatActivity() {
     private fun setupToolbar() {
         toolbar.setTitle(string.home_activity_title)
         this.setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            
-        }
     }
 
     private fun openNextActivity() {
-        val nextIntent = Intent(this,  NextActivity::class.java)
+        val nextIntent = Intent(this,  MainActivity::class.java)
         startActivity(nextIntent)
     }
 

@@ -6,12 +6,10 @@ import android.support.v7.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.TextView
 import com.arqathon.glennreilly.augmentedaudio.R
-import com.arqathon.glennreilly.augmentedaudio.R.layout
+import com.arqathon.glennreilly.augmentedaudio.model.PointOfInterest
 
-data class Place(var name: String)
 
 data class NextViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
@@ -22,9 +20,9 @@ data class NextViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
 class NextAdapter(val activity: Activity) : Adapter<NextViewHolder>() {
 
-    private val places: MutableList<Place>  = mutableListOf()
+    private val places: MutableList<PointOfInterest>  = mutableListOf()
 
-    fun addAll(items: List<Place>) {
+    fun addAll(items: List<PointOfInterest>) {
         places.clear()
         places.addAll(items)
     }
