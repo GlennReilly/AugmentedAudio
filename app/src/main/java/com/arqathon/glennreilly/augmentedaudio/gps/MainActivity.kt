@@ -1,55 +1,39 @@
-package com.arqathon.glennreilly.augmentedaudio
-
+package com.arqathon.glennreilly.augmentedaudio.gps
 
 import android.Manifest
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.Uri
-import android.os.Bundle
-import android.preference.PreferenceManager
 import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
-import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager
-import com.arqathon.glennreilly.augmentedaudio.audio.SoundManager.getCurrentVolume
-import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity
-import com.arqathon.glennreilly.augmentedaudio.gps.MainActivity.Companion
+import com.arqathon.glennreilly.augmentedaudio.BuildConfig
+import com.arqathon.glennreilly.augmentedaudio.R
 import com.arqathon.glennreilly.augmentedaudio.gps.services.LocationMonitoringService
-import com.arqathon.glennreilly.augmentedaudio.service.ActivityRecognitionService
+
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.google.android.gms.location.ActivityRecognitionClient
 
-import kotlinx.android.synthetic.main.activity_main.mMsgView
 
-class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
-    private var mActivityRecognitionClient: ActivityRecognitionClient? = null
-    private var mAdapter: ActivitiesAdapter? = null
-
-    private val activityDetectionPendingIntent: PendingIntent
-        get() {
-            val intent = Intent(this, ActivityRecognitionService::class.java)
-            return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-        }
+class MainActivity : AppCompatActivity() {
 
 
     private var mAlreadyStartedService = false
+    private var mMsgView: TextView? = null
 
     /**
      * Return the availability of GooglePlayServices
@@ -67,21 +51,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             return true
         }
 
-
-    public override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val detectedActivitiesListView = findViewById<View>(R.id.activities_listview) as ListView
-
-        val detectedActivities = ActivityRecognitionService.detectedActivitiesFromJson(
-            PreferenceManager.getDefaultSharedPreferences(this).getString(
-                DETECTED_ACTIVITY, ""
-            )
-        )
-        mAdapter = ActivitiesAdapter(this, detectedActivities)
-        detectedActivitiesListView.adapter = mAdapter
-        mActivityRecognitionClient = ActivityRecognitionClient(this)
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
             object : BroadcastReceiver() {
@@ -90,81 +63,26 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     val longitude = intent.getStringExtra(LocationMonitoringService.EXTRA_LONGITUDE)
 
                     if (latitude != null && longitude != null) {
-                        (mMsgView as TextView).text = getString(R.string.msg_location_service_started) + "\n Latitude : " + latitude + "\n Longitude: " + longitude
+                        mMsgView!!.text = getString(R.string.msg_location_service_started) + "\n Latitude : " + latitude + "\n Longitude: " + longitude
                     }
                 }
             }, IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST)
         )
     }
 
-    override fun onResume() {
+
+    public override fun onResume() {
         super.onResume()
-        SoundManager.configureSound(this)
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .registerOnSharedPreferenceChangeListener(this)
-        updateDetectedActivitiesList()
 
         startStep1()
     }
 
-    override fun onPause() {
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .unregisterOnSharedPreferenceChangeListener(this)
-        super.onPause()
-    }
-
-    fun requestUpdatesHandler(view: View) {
-        val task = mActivityRecognitionClient!!.requestActivityUpdates(
-            3000, activityDetectionPendingIntent
-        )
-        task.addOnSuccessListener { updateDetectedActivitiesList() }
-    }
-
-    private fun updateDetectedActivitiesList() {
-
-        val mostProbableActivity =
-            ActivityRecognitionService.getMostProbableActivityFromJson(
-                PreferenceManager.getDefaultSharedPreferences(this)
-                    .getString(MOST_PROBABLE_ACTIVITY, "")
-            )
-
-        val level = getCurrentVolume(this) //TODO need to factor in how our volume relates to system volume. Percentage?
-
-        mostProbableActivity?.let {
-            SoundManager.playSoundFor(it, applicationContext)
-        }
-
-        val detectedActivities = ActivityRecognitionService.detectedActivitiesFromJson(
-            PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(DETECTED_ACTIVITY, "")
-        )
-
-        mAdapter!!.updateActivities(detectedActivities)
-    }
-
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
-        if (s == DETECTED_ACTIVITY) {
-            updateDetectedActivitiesList()
-        }
-    }
-
-    companion object {
-        val DETECTED_ACTIVITY = ".DETECTED_ACTIVITY"
-        val MOST_PROBABLE_ACTIVITY = ".MOST_PROBABLE_ACTIVITY"
-        private val TAG = MainActivity::class.java.simpleName
-
-        /**
-         * Code used in requesting runtime permissions.
-         */
-        private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
-    }
 
     /**
      * Step 1: Check Google Play services
      */
     private fun startStep1() {
-        Log.d("ASD", "STEP 1")
+
         //Check whether this user has installed Google play service which is being used by Location updates.
         if (isGooglePlayServicesAvailable) {
 
@@ -176,11 +94,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+
     /**
      * Step 2: Check & Prompt Internet connection
      */
     private fun startStep2(dialog: DialogInterface?): Boolean {
-        Log.d("ASD", "STEP 2")
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
 
@@ -230,7 +148,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
 
-
         val dialog = builder.create()
         dialog.show()
     }
@@ -239,13 +156,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
      * Step 3: Start the Location Monitor Service
      */
     private fun startStep3() {
-        Log.d("ASD", "STEP 3")
+
         //And it will be keep running until you close the entire application from task manager.
         //This method will executed only once.
 
         if (!mAlreadyStartedService && mMsgView != null) {
 
-            (mMsgView as TextView).setText(R.string.msg_location_service_started)
+            mMsgView!!.setText(R.string.msg_location_service_started)
 
             //Start location sharing service to app server.........
             val intent = Intent(this, LocationMonitoringService::class.java)
@@ -255,6 +172,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             //Ends................................................
         }
     }
+
 
     /**
      * Return the current state of the permissions needed.
@@ -271,25 +189,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         )
 
         return permissionState1 == PackageManager.PERMISSION_GRANTED && permissionState2 == PackageManager.PERMISSION_GRANTED
-    }
 
-    /**
-     * Shows a [Snackbar].
-     *
-     * @param mainTextStringId The id for the string resource for the Snackbar text.
-     * @param actionStringId   The text of the action item.
-     * @param listener         The listener associated with the Snackbar action.
-     */
-    private fun showSnackbar(
-        mainTextStringId: Int, actionStringId: Int,
-        listener: View.OnClickListener
-    ) {
-        Snackbar.make(
-            findViewById<View>(android.R.id.content),
-            getString(mainTextStringId),
-            Snackbar.LENGTH_INDEFINITE
-        )
-            .setAction(getString(actionStringId), listener).show()
     }
 
     /**
@@ -334,6 +234,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+
+    /**
+     * Shows a [Snackbar].
+     *
+     * @param mainTextStringId The id for the string resource for the Snackbar text.
+     * @param actionStringId   The text of the action item.
+     * @param listener         The listener associated with the Snackbar action.
+     */
+    private fun showSnackbar(
+        mainTextStringId: Int, actionStringId: Int,
+        listener: View.OnClickListener
+    ) {
+        Snackbar.make(
+            findViewById<View>(android.R.id.content),
+            getString(mainTextStringId),
+            Snackbar.LENGTH_INDEFINITE
+        )
+            .setAction(getString(actionStringId), listener).show()
+    }
 
     /**
      * Callback received when a permissions request has been completed.
@@ -383,107 +302,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
 
-    public override fun onDestroy() {
+    companion object {
 
+        private val TAG = MainActivity::class.java.simpleName
 
-        //Stop location sharing service to app server.........
-
-        stopService(Intent(this, LocationMonitoringService::class.java))
-        mAlreadyStartedService = false
-        //Ends................................................
-
-
-        super.onDestroy()
+        /**
+         * Code used in requesting runtime permissions.
+         */
+        private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
     }
-
 
 }
-
-/*
-class MainActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, TextToSpeech.OnInitListener {
-
-    var mTTS: TextToSpeech? = null
-    private val ACT_CHECK_TTS_DATA = 1000
-    private lateinit var activityRecognitionClient: ActivityRecognitionClient
-    var mApiClient: GoogleApiClient? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        mApiClient = GoogleApiClient.Builder(this)
-                .addApi(ActivityRecognition.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build()
-
-        (mApiClient as GoogleApiClient).connect()
-        activityRecognitionClient = ActivityRecognitionClient(this)
-    }
-
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            if (mTTS != null) {
-                val result = (mTTS as TextToSpeech).setLanguage(Locale.US)
-                if (result == TextToSpeech.LANG_MISSING_DATA ||
-                        result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Toast.makeText(this, "TTS language is not supported", Toast.LENGTH_LONG).show()
-                } else {
-                    saySomething("TTS is ready", 0)
-                }
-            }
-        } else {
-            Toast.makeText(this, "TTS initialization failed",
-                    Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun saySomething(text: String, qmode: Int) {
-        if (qmode == 1)
-            mTTS?.speak(text, TextToSpeech.QUEUE_ADD, null, null)
-        else
-            mTTS?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-    }
-
-    override fun onConnected(bundle: Bundle?) {
-        val intent = Intent(this, ActivityRecognizedService::class.java)
-        val pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        val task = activityRecognitionClient.requestActivityUpdates(3000, pendingIntent)
-        //task.addOnSuccessListener { }
-    }
-
-    override fun onConnectionSuspended(i: Int) {
-
-    }
-
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == ACT_CHECK_TTS_DATA) {
-            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                // Data exists, so we instantiate the TTS engine
-                mTTS = TextToSpeech(this, this)
-            } else {
-                // Data is missing, so we start the TTS
-                // installation process
-                val installIntent = Intent()
-                installIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
-                startActivity(installIntent)
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        if (mTTS != null) {
-            (mTTS as TextToSpeech).apply {
-                stop()
-                shutdown()
-            }
-        }
-        super.onDestroy()
-    }
-}
-*/
